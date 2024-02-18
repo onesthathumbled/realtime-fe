@@ -9,41 +9,22 @@ const Chat = () => {
     const cable = ActionCable.createConsumer("ws://localhost:3000/cable");
     const chatChannel = cable.subscriptions.create("ChatChannel", {
       received: (data) => {
-        setMessages(data.messages);
+        setMessages([...messages, data.message]);
       },
     });
 
     return () => {
       cable.subscriptions.remove(chatChannel);
     };
-  }, []);
+  }, [messages]);
 
   const handleInputChange = (e) => {
     setInput(e.target.value);
   };
 
   const handleSendMessage = () => {
-    fetch("http://localhost:3000/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ content: input }), // Send 'content' directly
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        return response.json(); // If your server responds with JSON
-      })
-      .then((data) => {
-        console.log("Message sent successfully:", data);
-      })
-      .catch((error) => {
-        console.error("There was a problem with the fetch operation:", error);
-      });
-
-    setInput("");
+    // Send message to the backend
+    // You may want to add user authentication and handle message sending logic here
   };
 
   return (
